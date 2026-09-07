@@ -61,6 +61,44 @@ liveSocket.connect();
 // >> liveSocket.disableLatencySim()
 window.liveSocket = liveSocket;
 
+// Locale menu: click-toggle, keyboard focus, aria-expanded sync, click-outside close
+function initLocaleMenus() {
+  document.querySelectorAll("[data-locale-menu]").forEach((container) => {
+    if (container._localeMenuInit) return;
+    container._localeMenuInit = true;
+
+    const btn = container.querySelector("[aria-controls]");
+    if (!btn) return;
+    const menuEl = document.getElementById(btn.getAttribute("aria-controls"));
+    if (!menuEl) return;
+
+    function open() {
+      menuEl.classList.remove("hidden");
+      btn.setAttribute("aria-expanded", "true");
+    }
+    function close() {
+      menuEl.classList.add("hidden");
+      btn.setAttribute("aria-expanded", "false");
+    }
+
+    btn.addEventListener("click", () => {
+      btn.getAttribute("aria-expanded") === "true" ? close() : open();
+    });
+    btn.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") { close(); btn.focus(); }
+    });
+    container.addEventListener("focusout", (e) => {
+      if (!container.contains(e.relatedTarget)) close();
+    });
+    document.addEventListener("click", (e) => {
+      if (!container.contains(e.target)) close();
+    }, true);
+  });
+}
+
+document.addEventListener("DOMContentLoaded", initLocaleMenus);
+window.addEventListener("phx:page-loading-stop", initLocaleMenus);
+
 window.addEventListener("phx:copy", (event) => {
   let text = event.target.innerText;
   navigator.clipboard.writeText(text).then(() => {
