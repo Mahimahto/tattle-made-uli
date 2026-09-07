@@ -139,11 +139,12 @@ defmodule UliCommunityWeb.Router do
       on_mount: [
         {UliCommunityWeb.LocaleOnMount, :set_locale},
         {UliCommunityWeb.UserAuth, :redirect_if_user_is_authenticated}
-      ] do
-      live("/users/register", UserRegistrationLive, :new)
-      live("/users/log_in", UserLoginLive, :new)
-      live("/users/reset_password", UserForgotPasswordLive, :new)
-      live("/users/reset_password/:token", UserResetPasswordLive, :edit)
+      ],
+      layout: {UliCommunityWeb.Layouts, :auth} do
+      live "/users/register", UserRegistrationLive, :new
+      live "/users/log_in", UserLoginLive, :new
+      live "/users/reset_password", UserForgotPasswordLive, :new
+      live "/users/reset_password/:token", UserResetPasswordLive, :edit
     end
 
     post("/users/log_in", UserSessionLiveController, :create)
